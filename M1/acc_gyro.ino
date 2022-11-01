@@ -7,7 +7,7 @@ void setup() {
     Serial.println("Error");
     while (1);
   }
-}q
+}
 
 void loop() {
   float ax, ay, az, gx, gy, gz;

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+	<svg width="500" height="400"></svg>
+	<span id="name"></span>
+</body>
+
+<script type="application/javascript">
+
+	const SERVERADDRESS = "http://127.0.0.1:3000"
+
+	var dataset1 = [[0.0, 0.0], [10.0, 0.0], [20.0, 0.0], [30.0, 0.0], [40.0, 0.0], [50.0, 0.0], [60.0, 0.0], [70.0, 0.0], [80.0, 0.0], [90.0, 0.0], [100.0, 0.0]];
+	var time = 110;
+
+	// use XML HTTP request to grab data from the server (central)
+	let xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function () {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			let responseText = xmlhttp.responseText
+			let sensorValue = parseFloat(JSON.parse(responseText).sensorValue)
+
+			// visualize
+			var lasttime = dataset1.shift()[0] + 10;
+			dataset1.push([time, sensorValue]);
+			time = time + 10;
+
+			// tutorial source: https://www.educative.io/answers/how-to-create-a-line-chart-using-d3
+
+			// append the svg object to the body of the page
+			var svg = d3.select("svg"),
+					margin = 200,
+					width = svg.attr("width") - margin,
+					height = svg.attr("height") - margin
+
+			var xScale = d3.scaleLinear().domain([0, 100]).range([0, width]),
+				yScale = d3.scaleLinear().domain([-3.0, 3.0]).range([height, 0]);
+
+			svg.selectAll("*").remove();
+
+			// text
+			svg.append('text')
+				.attr('x', width/2 + 100)
+				.attr('y', 100)
+				.attr('text-anchor', 'middle')
+				.style('font-family', 'Helvetica')
+				.style('font-size', 20)
+				.text('Accelerometer Values');
+				
+			// X label
+			svg.append('text')
+				.attr('x', width/2 + 100)
+				.attr('y', height - 15 + 150)
+				.attr('text-anchor', 'middle')
+				.style('font-family', 'Helvetica')
+				.style('font-size', 12)
+				.text('Time (Arbitrary)');
+				
+			// Y label
+			svg.append('text')
+				.attr('text-anchor', 'middle')
+				.attr('transform', 'translate(60,' + height + ')rotate(-90)')
+				.style('font-family', 'Helvetica')
+				.style('font-size', 12)
+				.text('Accelerometer Data');
+
+			var g = svg.append("g")
+				.attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+			g.append("g")
+				.attr("transform", "translate(0," + height + ")")
+				.call(d3.axisBottom(xScale));
+			
+			g.append("g")
+				.call(d3.axisLeft(yScale));
+
+			svg.append('g')
+				.selectAll("dot")
+				.data(dataset1)
+				.enter()
+				.append("circle")
+				.attr("cx", function (d) { return xScale(d[0] - lasttime); } )
+				.attr("cy", function (d) { return yScale(d[1]); } )
+				.attr("r", 2)
+				.attr("transform", "translate(" + 100 + "," + 100 + ")")
+				.style("fill", "#CC0000");
+				
+			var line = d3.line()
+				.x(function(d) { return xScale(d[0] - lasttime); }) 
+				.y(function(d) { return yScale(d[1]); }) 
+				.curve(d3.curveMonotoneX)
+				
+				svg.append("path")
+				.datum(dataset1) 
+				.attr("class", "line") 
+				.attr("transform", "translate(" + 100 + "," + 100 + ")")
+				.attr("d", line)
+				.style("fill", "none")
+				.style("stroke", "#CC0000")
+				.style("stroke-width", "2");
+
+		}
+	}
+
+	// periodically grab data
+	let getData = () => {
+		xmlhttp.open("POST", SERVERADDRESS, true)
+		xmlhttp.setRequestHeader("Content-type", "application/json")
+		xmlhttp.send("")
+		setTimeout(() => {
+			getData()
+		}, 10)
+	}
+
+	getData()
+
+</script>
+
+</html>

@@ -1,4 +1,4 @@
-// based on the example on https://www.npmjs.com/package/@abandonware/noble
+// based on the example on https://www.npmjs.com/package/@abandonware/noble and https://github.com/ajmalmohad/ping-pong
 
 const noble = require('@abandonware/noble');
 

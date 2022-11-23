@@ -3,9 +3,13 @@
 const noble = require('@abandonware/noble');
 
 const uuid_service = "1109"
-const uuid_value = "7109"
+const uuid_value_x = "7109"
+const uuid_value_y = "2102"
+const uuid_value_z = "2103"
 
-let sensorValue = NaN
+let sensorValue_x = NaN
+let sensorValue_y = NaN
+let sensorValue_z = NaN
 
 noble.on('stateChange', async (state) => {
     if (state === 'poweredOn') {
@@ -19,21 +23,26 @@ noble.on('discover', async (peripheral) => {
     await peripheral.connectAsync();
     const {
         characteristics
-    } = await peripheral.discoverSomeServicesAndCharacteristicsAsync([uuid_service], [uuid_value]);
-    readData(characteristics[0])
+    } = await peripheral.discoverSomeServicesAndCharacteristicsAsync([uuid_service], [uuid_value_x, uuid_value_y, uuid_value_z]);
+    readData(characteristics[0], characteristics[1], characteristics[2])
 });
 
 //
 // read data periodically
 //
-let readData = async (characteristic) => {
-    const value = (await characteristic.readAsync());
-    sensorValue = value.readFloatLE(0);
+let readData = async (characteristic_x, characteristic_y, characteristic_z) => {
+    const value_x = (await characteristic_x.readAsync());
+    const value_y = (await characteristic_y.readAsync());
+    const value_z = (await characteristic_z.readAsync());
+    sensorValue_x = value_x.readFloatLE(0);
+    sensorValue_y = value_y.readFloatLE(0);
+    sensorValue_z = value_z.readFloatLE(0);
+    console.log(sensorValue_x, sensorValue_y, sensorValue_z);
     // console.log(sensorValue);
 
     // read data again in t milliseconds
     setTimeout(() => {
-        readData(characteristic)
+        readData(characteristic_x, characteristic_y, characteristic_z)
     }, 10);
 }
 
@@ -64,7 +73,9 @@ app.post('/', (req, res) => {
         'Content-Type': 'application/json'
     });
     res.end(JSON.stringify({
-        sensorValue: sensorValue
+        sensorValue_x: sensorValue_x,
+        sensorValue_y: sensorValue_y,
+        sensorValue_z: sensorValue_z
     }))
 })
 

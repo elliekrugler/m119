@@ -33,7 +33,9 @@
         const context = canvas.getContext("2d")
         sessionStorage.setItem("winner", "None");
 
-		let sensorValue = NaN;
+		let sensorValue_x = NaN;
+        let sensorValue_y = NaN;
+        let sensorValue_z = NaN;
 
         /**
          * Objects
@@ -134,23 +136,25 @@
 
         function drawAll() {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            // drawLine()
+            drawLine()
             drawLeftPlayer()
             drawRightPlayer()
             drawBall()
 			xmlhttp.open("POST", SERVERADDRESS, true)
 			xmlhttp.setRequestHeader("Content-type", "application/json")
 			xmlhttp.send("")
-			if(sensorValue > 0){
-				if(rightPlayer.positionY > 0){
-					rightPlayer.positionY -= rightPlayer.speed
-				}
-			}
-			else if(sensorValue < 0) {
-				if(rightPlayer.positionY < canvas.height - rightPlayer.height){
-					rightPlayer.positionY += rightPlayer.speed
-				}
-			}
+            if(sensorValue_x > -0.5){
+                if(sensorValue_y > 0.5){
+                    if(rightPlayer.positionY > 0){
+                        rightPlayer.positionY -= rightPlayer.speed
+                    }
+                }
+                else if(sensorValue_z < -0.5) {
+                    if(rightPlayer.positionY < canvas.height - rightPlayer.height){
+                        rightPlayer.positionY += rightPlayer.speed
+                    }
+                }
+            }
 			if(keyPressed['Up']){
 				if(leftPlayer.positionY > 0){
 					leftPlayer.positionY -= leftPlayer.speed
@@ -386,7 +390,9 @@
 		xmlhttp.onreadystatechange = function () {
 			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 				let responseText = xmlhttp.responseText
-				sensorValue = parseFloat(JSON.parse(responseText).sensorValue)
+				sensorValue_x = parseFloat(JSON.parse(responseText).sensorValue_x)
+                sensorValue_y = parseFloat(JSON.parse(responseText).sensorValue_y)
+                sensorValue_z = parseFloat(JSON.parse(responseText).sensorValue_z)
 			}
 		}
 

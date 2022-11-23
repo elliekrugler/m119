@@ -7,3 +7,5 @@ This is an improvement on the M4 implementation because with the past implementa
 This game was also extended to two players by having the keyboard control the left player while the Arduino still controls the right player via BLE.
 
 The metrics for success would be user comfortability and how quickly it is to learn the controls. This method is more comfortable and achievable for the user. However, the prior method may have been more intuitive, since the rotation moved toward or away from the screen, which felt more like "up" or "down."
+
+*pong setup based on the example on https://www.npmjs.com/package/@abandonware/noble*
